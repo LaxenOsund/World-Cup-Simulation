@@ -6,7 +6,7 @@ ELO_WIDTH = 400
 K_FACTOR = 32
 HOME_ADVANTAGE_POINTS = 100
 
-
+ 
 def calculate_elo(home_elo, away_elo, match_outcome, home_advantage):
     """
     Calculates Elo based on match outcome.
