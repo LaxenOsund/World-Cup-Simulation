@@ -1,0 +1,7 @@
+Main anropar elo_engine: "Hej, räkna ut och ge mig en dictionary med alla lagens aktuella Elo-poäng." X
+
+Main anropar tournament_logic: "Hej, skapa ett tomt gruppspel och ge mig en lista på alla matcher som ska spelas." X
+
+Main anropar match_simulator: "Hej, här är listan med matcher och lagens Elo. Slå tärningarna och ge mig en lista med alla resultat (mål)."
+
+Main anropar tournament_logic IGEN: "Hej, här är alla resultat. Fyll i tabellerna, sortera dem, och ge mig en lista på de 32 lag som går vidare till slutspelet."

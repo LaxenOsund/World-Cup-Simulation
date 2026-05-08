@@ -1,5 +1,5 @@
 import pandas as pd
-from datafetcher import fetch_data
+import math
 
 MEAN_ELO = 1500
 ELO_WIDTH = 400
@@ -9,19 +9,22 @@ HOME_ADVANTAGE_POINTS = 100
  
 def calculate_elo(home_elo, away_elo, match_outcome, home_advantage):
     """
-    Calculates Elo based on match outcome.
+    Calculates Elo based on match outcome with logarithmic MoV adjustment.
     https://en.wikipedia.org/wiki/Elo_rating_system#Mathematical_details
     """
     effective_home_elo = home_elo + home_advantage
     expected_home = 1 / (1 + 10 ** ((away_elo - effective_home_elo) / ELO_WIDTH))
     expected_away = 1- expected_home
 
-    away_result = 1.0 - match_outcome
+    away_result = 1.0 - match_outcome[0]
 
-    new_home_elo = home_elo + K_FACTOR * (match_outcome - expected_home)
-    new_loser_elo = away_elo + K_FACTOR * (away_result - expected_away)
+    #logarithmig MoV adjustment on K value to reward high scoring teams
+    adj_k = K_FACTOR * (1 + math.log(max(1, match_outcome[1])))
+    
+    new_home_elo = home_elo + adj_k * (match_outcome[0] - expected_home)
+    new_away_elo = away_elo + adj_k * (away_result - expected_away)
 
-    return new_home_elo, new_loser_elo
+    return new_home_elo, new_away_elo
 
 def calculate_match_outcome(home_score, away_score):
     """
@@ -36,7 +39,8 @@ def calculate_match_outcome(home_score, away_score):
         match_outcome = 0.5
     else:
         match_outcome = 0
-    return match_outcome
+    goal_diff = abs(home_score - away_score)
+    return match_outcome, goal_diff
 
 def check_advantage(home_team,match_country):
     """
@@ -47,8 +51,8 @@ def check_advantage(home_team,match_country):
         return HOME_ADVANTAGE_POINTS
     return 0
     
-def main():
-    df = pd.read_csv("results.csv") 
+def get_all_elos(filepath):
+    df = pd.read_csv(filepath) 
     df.drop(labels = ["city","tournament","neutral"], inplace=True,axis = 1) 
 
     team_elos = {} 
@@ -79,13 +83,10 @@ def main():
         team_elos[home_team] = new_home_elo
         team_elos[away_team] = new_away_elo
 
-    print("Alla matcher är analyserade och Elo-systemet är uppdaterat!")
+    return team_elos
 
-    # Extra: Skriv ut topp 10-lagen just nu (sorterar ordboken från högst till lägst)
-    top_teams = sorted(team_elos.items(), key=lambda x: x[1], reverse=True)
-    print("\n--- Topp 10 Lag ---")
-    for i in range(10):
-        print(f"{i+1}. {top_teams[i][0]}: {top_teams[i][1]:.0f} poäng")
-
-if __name__ == "__main__":
-    main()
+    # Prints top 25 teams 
+    #top_teams = sorted(team_elos.items(), key=lambda x: x[1], reverse=True)
+    #print("\n--- Top 25 Teams ---")
+    #for i in range(25):
+    #    print(f"{i+1}. {top_teams[i][0]}: {top_teams[i][1]:.0f} poäng")
