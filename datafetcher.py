@@ -13,6 +13,8 @@ def fetch_data():
         # Filter out games that have not been played yet
         today = pd.Timestamp.today()
         df = df[df["date"] <= today]
+
+        df = df[df["date"] >= "2010-01-01"]
         
         print(f"Hämtade {len(df)} matcher fram till {df['date'].max().date()}")
         return df   
