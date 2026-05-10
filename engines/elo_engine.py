@@ -3,11 +3,12 @@ import math
 
 MEAN_ELO = 1500
 ELO_WIDTH = 400
-K_FACTOR = 32
 HOME_ADVANTAGE_POINTS = 100
+FRIENDLY_K = 20
+TOURNAMENT_K = 40
 
  
-def calculate_elo(home_elo, away_elo, match_outcome, home_advantage):
+def calculate_elo(home_elo, away_elo, match_outcome, home_advantage, k_factor):
     """
     Calculates Elo based on match outcome with logarithmic MoV adjustment.
     https://en.wikipedia.org/wiki/Elo_rating_system#Mathematical_details
@@ -19,7 +20,7 @@ def calculate_elo(home_elo, away_elo, match_outcome, home_advantage):
     away_result = 1.0 - match_outcome[0]
 
     #logarithmig MoV adjustment on K value to reward high scoring teams
-    adj_k = K_FACTOR * (1 + math.log(max(1, match_outcome[1])))
+    adj_k = k_factor * (1 + math.log(max(1, match_outcome[1])))
     
     new_home_elo = home_elo + adj_k * (match_outcome[0] - expected_home)
     new_away_elo = away_elo + adj_k * (away_result - expected_away)
@@ -53,7 +54,7 @@ def check_advantage(home_team,match_country):
     
 def get_all_elos(filepath):
     df = pd.read_csv(filepath) 
-    df.drop(labels = ["city","tournament","neutral"], inplace=True,axis = 1) 
+    df.drop(labels = ["city","neutral"], inplace=True,axis = 1) 
 
     team_elos = {} 
 
@@ -64,6 +65,7 @@ def get_all_elos(filepath):
         home_score = row["home_score"] 
         away_score = row["away_score"] 
         #Retrives match data 
+        tournament = row["tournament"]
         match_country = row["country"] 
 
         # Checks if team is missing from Elo ladder and adds them if they are
@@ -72,18 +74,29 @@ def get_all_elos(filepath):
         if away_team not in team_elos:
             team_elos[away_team] = MEAN_ELO
         
+        k_factor = k_finder(tournament)
         match_outcome = calculate_match_outcome(home_score, away_score)
         current_advantage = check_advantage(home_team,match_country)
 
         current_home_elo = team_elos[home_team]
         current_away_elo = team_elos[away_team]
 
-        new_home_elo, new_away_elo = calculate_elo(current_home_elo, current_away_elo, match_outcome, current_advantage)
+        new_home_elo, new_away_elo = calculate_elo(current_home_elo, current_away_elo, match_outcome, current_advantage,k_factor)
 
         team_elos[home_team] = new_home_elo
         team_elos[away_team] = new_away_elo
 
     return team_elos
+
+def k_finder(tournament):
+    if tournament == "friendly":
+        return FRIENDLY_K
+    #checks if match related to FIFA World Cup    
+    elif "FIFA World Cup" in tournament:
+        return TOURNAMENT_K
+    else:
+        return 30
+
 
     # Prints top 25 teams 
     #top_teams = sorted(team_elos.items(), key=lambda x: x[1], reverse=True)

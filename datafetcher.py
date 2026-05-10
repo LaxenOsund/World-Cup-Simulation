@@ -14,7 +14,7 @@ def fetch_data():
         today = pd.Timestamp.today()
         df = df[df["date"] <= today]
 
-        df = df[df["date"] >= "2010-01-01"]
+        df = df[df["date"] >= "1000-01-01"]
         
         print(f"Hämtade {len(df)} matcher fram till {df['date'].max().date()}")
         return df   

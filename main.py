@@ -9,7 +9,7 @@ def main():
     team_stats, global_team_avg = calculate_team_strength("results.csv")
 
     champions = {}
-    SIMULATIONS = 1_000_00
+    SIMULATIONS = 1_000_0
 
     print(f"Starting Monte Carlo simulation ({SIMULATIONS} tournaments)...")
 
@@ -65,6 +65,9 @@ def main():
     for team, wins in sorted_champions:
         probability = (wins / SIMULATIONS) * 100
         print(f"{team}: {probability:.1f}% ({wins} wins)")
+    #print(results)
+    #print(sorted_groups)
+#    print(team_elos)
 
 if __name__ == "__main__":
     main()
