@@ -2,7 +2,7 @@ import pandas as pd
 import math
 
 MEAN_ELO = 1500
-ELO_WIDTH = 400
+ELO_WIDTH = 800
 HOME_ADVANTAGE_POINTS = 100
 FRIENDLY_K = 20
 TOURNAMENT_K = 40

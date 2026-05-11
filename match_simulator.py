@@ -1,8 +1,8 @@
 #lambda = average global goals * Team_A_AS * Team_B_DS
 import numpy as np
-
+ELO_WIDTH = 800
 def simulate_matches(game_list, team_stats,team_elos, AVERAGE_GOALS):
-    ELO_WIDTH = 400
+    
     results = []
     for game in game_list:
         group = game[0]
@@ -40,8 +40,6 @@ def simulate_knockout_matches(game_list,team_stats,team_elos,AVERAGE_GOALS):
     """
     Same as simulate matches but in case of draw give win to higher elo team
     """
-    
-    ELO_WIDTH = 400
     results = []
     for game in game_list:
         game_id = game[0]

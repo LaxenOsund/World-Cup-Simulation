@@ -2,6 +2,7 @@ import tournament_logic
 from engines.elo_engine import get_all_elos
 from engines.team_stats_engine import calculate_team_strength
 from match_simulator import simulate_matches, simulate_knockout_matches
+import visualize
 
 def main():
 
@@ -9,7 +10,7 @@ def main():
     team_stats, global_team_avg = calculate_team_strength("results.csv")
 
     champions = {}
-    SIMULATIONS = 1_000_0
+    SIMULATIONS = 30_00
 
     print(f"Starting Monte Carlo simulation ({SIMULATIONS} tournaments)...")
 
@@ -33,19 +34,19 @@ def main():
         r16_results = simulate_knockout_matches(r16_matches, team_stats, team_elos, global_team_avg)
         r16_advancing_teams = tournament_logic.knockout_advancing_teams(r16_results)
 
-        r8_matches = tournament_logic.knockout_generator(r16_advancing_teams, tournament_logic.Round_of_8)
-        r8_results = simulate_knockout_matches(r8_matches, team_stats, team_elos, global_team_avg)
-        r8_advancing_teams = tournament_logic.knockout_advancing_teams(r8_results)
+        qf_matches = tournament_logic.knockout_generator(r16_advancing_teams, tournament_logic.Round_of_8)
+        qf_results = simulate_knockout_matches(qf_matches, team_stats, team_elos, global_team_avg)
+        qf_advancing_teams = tournament_logic.knockout_advancing_teams(qf_results)
         
-        r4_matches = tournament_logic.knockout_generator(r8_advancing_teams, tournament_logic.Round_of_4)
-        r4_results = simulate_knockout_matches(r4_matches, team_stats, team_elos, global_team_avg)
-        r4_advancing_teams = tournament_logic.knockout_advancing_teams(r4_results)
+        sf_matches = tournament_logic.knockout_generator(qf_advancing_teams, tournament_logic.Round_of_4)
+        sf_results = simulate_knockout_matches(sf_matches, team_stats, team_elos, global_team_avg)
+        sf_advancing_teams = tournament_logic.knockout_advancing_teams(sf_results)
         
-        r2_matches = tournament_logic.knockout_generator(r4_advancing_teams, tournament_logic.final)
-        r2_results = simulate_knockout_matches(r2_matches, team_stats, team_elos, global_team_avg)
+        final_match = tournament_logic.knockout_generator(sf_advancing_teams, tournament_logic.final)
+        final_results = simulate_knockout_matches(final_match, team_stats, team_elos, global_team_avg)
         
         # Extract the winning team from the final match dictionary
-        winner_dict = tournament_logic.knockout_advancing_teams(r2_results)
+        winner_dict = tournament_logic.knockout_advancing_teams(final_results)
         champion = list(winner_dict.values())[0]
 
         # Record tournament win
@@ -65,9 +66,11 @@ def main():
     for team, wins in sorted_champions:
         probability = (wins / SIMULATIONS) * 100
         print(f"{team}: {probability:.1f}% ({wins} wins)")
+    visualize.plot_probabilities(champions, SIMULATIONS)
     #print(results)
     #print(sorted_groups)
 #    print(team_elos)
+
 
 if __name__ == "__main__":
     main()
