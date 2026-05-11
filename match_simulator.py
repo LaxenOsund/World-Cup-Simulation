@@ -1,7 +1,9 @@
 #lambda = average global goals * Team_A_AS * Team_B_DS
 import numpy as np
 ELO_WIDTH = 800
-def simulate_matches(game_list, team_stats,team_elos, AVERAGE_GOALS):
+HOST_NATIONS = ["Mexico", "Canada", "United States"]
+
+def simulate_matches(game_list, team_stats,team_elos, AVERAGE_GOALS, is_knockout):
     
     results = []
     for game in game_list:
@@ -18,46 +20,9 @@ def simulate_matches(game_list, team_stats,team_elos, AVERAGE_GOALS):
         team_b_ds = team_stats.get(team_b, {}).get("DS", 1.0)
 
         #To calculate for home advantage
-        if team_a in ["Mexico", "Canada", "United States"]:
+        if team_a in HOST_NATIONS:
             team_a_elo += 100
-        if team_b in ["Mexico", "Canada", "United States"]:
-            team_b_elo += 100
-        
-        expected_a = 1 / (1 + 10 ** ((team_b_elo - team_a_elo) / ELO_WIDTH))
-        expected_b = 1- expected_a
-
-        TOTAL_MATCH_GOALS = AVERAGE_GOALS * 2
-        lambda_a = (expected_a * TOTAL_MATCH_GOALS * team_a_as * team_b_ds)
-        goals_a = np.random.poisson(lambda_a)
-
-        lambda_b = (expected_b * TOTAL_MATCH_GOALS * team_b_as * team_a_ds)
-        goals_b = np.random.poisson(lambda_b)
-    
-        results.append((group, team_a, team_b, goals_a, goals_b))
-    return results
-
-def simulate_knockout_matches(game_list,team_stats,team_elos,AVERAGE_GOALS):
-    """
-    Same as simulate matches but in case of draw give win to higher elo team
-    """
-    results = []
-    for game in game_list:
-        game_id = game[0]
-        team_a = game[1]
-        team_b = game[2]
-
-        team_a_elo = team_elos.get(team_a, 1500)
-        team_a_as = team_stats.get(team_a, {}).get("AS", 1.0)
-        team_a_ds = team_stats.get(team_a, {}).get("DS", 1.0)
-
-        team_b_elo = team_elos.get(team_b, 1500)
-        team_b_as = team_stats.get(team_b, {}).get("AS", 1.0)
-        team_b_ds = team_stats.get(team_b, {}).get("DS", 1.0)
-
-        #To calculate for home advantage
-        if team_a in ["Mexico", "Canada", "United States"]:
-            team_a_elo += 100
-        if team_b in ["Mexico", "Canada", "United States"]:
+        if team_b in HOST_NATIONS:
             team_b_elo += 100
         
         expected_a = 1 / (1 + 10 ** ((team_b_elo - team_a_elo) / ELO_WIDTH))
@@ -70,10 +35,12 @@ def simulate_knockout_matches(game_list,team_stats,team_elos,AVERAGE_GOALS):
         lambda_b = (expected_b * TOTAL_MATCH_GOALS * team_b_as * team_a_ds)
         goals_b = np.random.poisson(lambda_b)
 
-        if goals_a == goals_b:
+        if is_knockout and goals_a == goals_b:
             if team_a_elo > team_b_elo:
                 goals_a += 1
             else:
                 goals_b += 1
-        results.append((game_id, team_a, team_b, goals_a, goals_b))
+    
+        results.append((group, team_a, team_b, goals_a, goals_b))
+        
     return results

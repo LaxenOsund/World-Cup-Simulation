@@ -1,7 +1,7 @@
 import tournament_logic
 from engines.elo_engine import get_all_elos
 from engines.team_stats_engine import calculate_team_strength
-from match_simulator import simulate_matches, simulate_knockout_matches
+from match_simulator import simulate_matches, simulate_matches
 import visualize
 
 def main():
@@ -20,34 +20,31 @@ def main():
         tournament_matches = tournament_logic.create_all_matches(tournament_logic.world_cup_groups_2026)
         
         # Group Stage
-        results = simulate_matches(tournament_matches, team_stats, team_elos, global_team_avg)
+        results = simulate_matches(tournament_matches, team_stats, team_elos, global_team_avg,False)
         updated_table = tournament_logic.update_standings(results, tournament_standings)
         sorted_groups = tournament_logic.sort_groups(updated_table, tournament_logic.world_cup_groups_2026)
         advancing_teams = tournament_logic.advancing_teams(sorted_groups)
 
         # Knockout Stages
+
+        knockout_rounds = [
+            tournament_logic.Round_of_16,
+            tournament_logic.Round_of_8,
+            tournament_logic.Round_of_4,
+            tournament_logic.final
+        ]
+
         r32_matches = tournament_logic.r32_generator(advancing_teams)
-        r32_results = simulate_knockout_matches(r32_matches, team_stats, team_elos, global_team_avg)
-        r32_advancing_teams = tournament_logic.knockout_advancing_teams(r32_results)
+        r32_results = simulate_matches(r32_matches, team_stats, team_elos, global_team_avg,True)
+        current_advancing_teams = tournament_logic.knockout_advancing_teams(r32_results)
 
-        r16_matches = tournament_logic.knockout_generator(r32_advancing_teams, tournament_logic.Round_of_16)
-        r16_results = simulate_knockout_matches(r16_matches, team_stats, team_elos, global_team_avg)
-        r16_advancing_teams = tournament_logic.knockout_advancing_teams(r16_results)
-
-        qf_matches = tournament_logic.knockout_generator(r16_advancing_teams, tournament_logic.Round_of_8)
-        qf_results = simulate_knockout_matches(qf_matches, team_stats, team_elos, global_team_avg)
-        qf_advancing_teams = tournament_logic.knockout_advancing_teams(qf_results)
-        
-        sf_matches = tournament_logic.knockout_generator(qf_advancing_teams, tournament_logic.Round_of_4)
-        sf_results = simulate_knockout_matches(sf_matches, team_stats, team_elos, global_team_avg)
-        sf_advancing_teams = tournament_logic.knockout_advancing_teams(sf_results)
-        
-        final_match = tournament_logic.knockout_generator(sf_advancing_teams, tournament_logic.final)
-        final_results = simulate_knockout_matches(final_match, team_stats, team_elos, global_team_avg)
+        for current_round in knockout_rounds:
+            matches = tournament_logic.knockout_generator(current_advancing_teams, current_round)
+            results = simulate_matches(matches, team_stats, team_elos, global_team_avg,True)
+            current_advancing_teams = tournament_logic.knockout_advancing_teams(results)
         
         # Extract the winning team from the final match dictionary
-        winner_dict = tournament_logic.knockout_advancing_teams(final_results)
-        champion = list(winner_dict.values())[0]
+        champion = list(current_advancing_teams.values())[0]
 
         # Record tournament win
         if champion in champions:
