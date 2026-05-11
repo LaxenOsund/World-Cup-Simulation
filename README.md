@@ -7,11 +7,11 @@ This project aims to simulate an entire FIFA World Cup using historical national
 The project is divided into several modules to handle data fetching, strength calculations, and goal simulations:
 
 * **`datafetcher.py`**: Automatically fetches historical match data for international men's teams from a public data source. It filters out future matches and saves the results to `results.csv`.
-* **`elo.py`**: Implements an Elo rating system tailored for international football.
+* **`elo_engine.py`**: Implements an Elo rating system tailored for international football.
     * Starting Elo is set to **1500**.
     * Accounts for **home field advantage** by adding 100 points to the home team's rating during calculations.
     * Dynamically updates team strengths after every match based on the result (win, draw, or loss).
-* **`poisson.py`**: Contains the logic to calculate the probability of a specific scoreline based on the teams' expected goal averages using Poisson distribution. This serves as the core of the simulation engine.
+
 
 ## Roadmap
 
