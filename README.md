@@ -18,10 +18,10 @@ The project is divided into several modules to handle data fetching, strength ca
 - [x] Data acquisition and storage.
 - [x] Elo system implementation for historical ranking.
 - [x] Poisson distribution logic for goal probabilities.
-- [ ] Group stage simulation engine.
-- [ ] Knockout stage simulation engine (including extra time/penalties).
-- [ ] Data visualization of the most likely tournament winners.
-- [ ] Tune Elo system to more accurately calculate Elo
+- [x] Group stage simulation engine.
+- [x] Knockout stage simulation engine (including extra time/penalties).
+- [x] Data visualization of the most likely tournament winners.
+- [Done but can always be better] Tune Elo system to more accurately calculate Elo
 
 ## Installation & Usage
 
