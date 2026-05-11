@@ -1,46 +1,61 @@
-# World Cup Simulation Project
+# 🏆 World Cup 2026 Monte Carlo Simulator
 
-This project aims to simulate an entire FIFA World Cup using historical national team data, Elo ratings, and Poisson distribution to predict match outcomes.
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![Data Science](https://img.shields.io/badge/Data_Science-Pandas_|_Matplotlib-orange.svg)
+![Monte Carlo](https://img.shields.io/badge/Simulation-Monte_Carlo-success.svg)
 
-## Project Structure
+A complete Data Science pipeline and simulation engine that predicts the winner of the expanded **48-team FIFA World Cup 2026**. 
 
-The project is divided into several modules to handle data fetching, strength calculations, and goal simulations:
+Instead of relying on simple guesswork, this project pulls historical match data, builds a custom **Elo rating system**, calculates team-specific **Attack/Defense Strengths**, and runs **10,000 Monte Carlo simulations** to find the mathematical probabilities of each nation lifting the trophy.
 
-* **`datafetcher.py`**: Automatically fetches historical match data for international men's teams from a public data source. It filters out future matches and saves the results to `results.csv`.
-* **`elo_engine.py`**: Implements an Elo rating system tailored for international football.
-    * Starting Elo is set to **1500**.
-    * Accounts for **home field advantage** by adding 100 points to the home team's rating during calculations.
-    * Dynamically updates team strengths after every match based on the result (win, draw, or loss).
+![World Cup Probabilities](vm_result.png)
+*(Example output of 10,000 simulations. Probabilities adjust dynamically based on the latest data).*
 
+---
 
-## Roadmap
+## 🚀 Key Features
 
-- [x] Data acquisition and storage.
-- [x] Elo system implementation for historical ranking.
-- [x] Poisson distribution logic for goal probabilities.
-- [x] Group stage simulation engine.
-- [x] Knockout stage simulation engine (including extra time/penalties).
-- [x] Data visualization of the most likely tournament winners.
-- [Done but can always be better] Tune Elo system to more accurately calculate Elo
+* **ETL Pipeline (`datafetcher.py`):** Automatically fetches, cleans, and time-filters historical international match data (from August 2018 onwards to ensure modern form relevance).
+* **Custom Elo Engine (`elo_engine.py`):** Calculates dynamic Elo ratings for all national teams based on actual historical results.
+* **Statistical Modeling (`team_stats_engine.py`):** Calculates expected Attack Strength (AS) and Defense Strength (DS) metrics relative to global averages.
+* **Poisson Match Simulator (`match_simulator.py`):** Uses statistical distribution to simulate realistic match scores (xG).
+* **Complex 48-Team Bracket Logic (`tournament_logic.py`):** Implements FIFA's 2026 format, including the "8 best third-place teams" logic.
+* **Monte Carlo Engine (`main.py`):** Simulates the entire tournament 10,000 times.
 
-## Installation & Usage
+---
 
-1.  **Install dependencies:**
-    ```bash
-    pip install pandas
-    ```
+## 🛠️ Installation & Usage
 
-2.  **Fetch the latest data:**
-    Run the data fetcher to update `results.csv` with the latest international results:
-    ```bash
-    python datafetcher.py
-    ```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/LaxenOsund/world-cup-simulation.git
+   cd world-cup-simulation
+   ```
+2. **Install dependencies:**
+   ```bash
+   pip install pandas matplotlib
+   ```
+3. **Run the Simulation:**
+   ```bash
+   python main.py
+   ```
+   
+### 📂 Project Structure
 
-3.  **Update Elo rankings:**
-    Process the historical data to generate current team ratings:
-    ```bash
-    python elo.py
-    ```
+```text
+world-cup-simulation/
+├── main.py                  # Main orchestrator (Monte Carlo loop)
+├── match_simulator.py       # Core match logic (Poisson distribution)
+├── tournament_logic.py      # FIFA rules and bracket routing
+├── datafetcher.py           # Data cleaning & ETL pipeline
+├── engines/                 # Mathematical Core
+│   ├── elo_engine.py        # Calculates Team Elo ratings
+│   └── team_stats_engine.py # Calculates Attack/Defense form (AS/DS)
+└── results.csv              # Filtered dataset (International results)
+```
 
-## Data Source
-The data used in this project is sourced from a comprehensive collection of international football results dating back to 1872.
+## 🧠 The Math Behind the Magic
+The engine calculates an expected goal (xG) value for each team based on Elo differences and Attack/Defense ratings. These variables are fed into a Poisson Distribution algorithm, generating realistic football scores.
+
+---
+*Created as a data science portfolio project.*
